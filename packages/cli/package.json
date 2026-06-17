@@ -1,0 +1,57 @@
+{
+  "name": "tinyi18n",
+  "version": "0.0.0",
+  "description": "A lightweight, out-of-the-box frontend i18n management tool and development suite.",
+  "keywords": [
+    "cli",
+    "i18n",
+    "internationalization",
+    "localization",
+    "tool",
+    "translation"
+  ],
+  "homepage": "https://github.com/michaelcocova/tinyi18n",
+  "bugs": {
+    "url": "https://github.com/michaelcocova/tinyi18n/issues"
+  },
+  "license": "MIT",
+  "author": "Michael Cocova",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelcocova/tinyi18n.git",
+    "directory": "packages/cli"
+  },
+  "bin": {
+    "tinyi18n": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "cross-spawn": "^7.0.6",
+    "jiti": "^2.7.0",
+    "kolorist": "^1.8.0",
+    "lowdb": "^7.0.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^24.13.1",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5",
+    "vite-plus": "0.1.24"
+  }
+}

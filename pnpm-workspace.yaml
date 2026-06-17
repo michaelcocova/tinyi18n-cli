@@ -1,0 +1,15 @@
+packages:
+  - packages/*
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"
+minimumReleaseAgeExclude:
+  - reka-ui@2.9.10
+allowBuilds:
+  "@parcel/watcher": true
+  esbuild: true
+  vue-demi: true

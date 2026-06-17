@@ -1,0 +1,28 @@
+{
+  "name": "@tinyi18n/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "author": {
+    "name": "Michael Cocova",
+    "email": "michael.cocova@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelcocova/tinyi18n.git"
+  },
+  "scripts": {
+    "build": "vp run tinyi18n#build",
+    "ready": "vp check && vp run -r test && vp run -r build",
+    "dev": "vp run tinyi18n#build && NODE_ENV=development node packages/cli/dist/index.mjs",
+    "release": "bumpp -r --commit \"chore: release v%s\" --push --tag",
+    "prepare": "vp config"
+  },
+  "devDependencies": {
+    "bumpp": "^11.1.0",
+    "tinyi18n": "workspace:*",
+    "typescript": "^5.9.3",
+    "vite-plus": "0.1.24"
+  },
+  "packageManager": "pnpm@11.7.0"
+}
