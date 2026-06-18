@@ -1,0 +1,51 @@
+{
+  "name": "@tinyi18n/monorepo",
+  "type": "module",
+  "version": "0.0.1-beta.1",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "author": {
+    "name": "Michael Cocova",
+    "email": "michael.cocova@gmail.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelcocova/tinyi18n-cli.git"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "commit": "cz",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{ts,js,vue,json,md}\"",
+    "release": "bumpp -r --commit \"chore: release v%s\" --push --tag",
+    "prepare": "simple-git-hooks"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.0.0",
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@commitlint/types": "^21.0.1",
+    "bumpp": "^11.1.0",
+    "commitizen": "^4.3.2",
+    "cz-git": "^1.13.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-format": "^2.0.1",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.4",
+    "simple-git-hooks": "^2.13.1",
+    "tinyi18n-cli": "workspace:*",
+    "tsdown": "^0.22.3",
+    "turbo": "^2.9.18",
+    "typescript": "^5.9.3",
+    "unplugin-unused": "^0.5.7",
+    "unrun": "^0.3.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  }
+}

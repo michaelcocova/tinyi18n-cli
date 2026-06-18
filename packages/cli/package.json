@@ -1,0 +1,57 @@
+{
+  "name": "tinyi18n-cli",
+  "type": "module",
+  "version": "0.0.1-beta.1",
+  "description": "A lightweight, out-of-the-box frontend i18n management tool and development suite.",
+  "author": "Michael Cocova",
+  "license": "MIT",
+  "homepage": "https://github.com/michaelcocova/tinyi18n-cli",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelcocova/tinyi18n-cli.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/michaelcocova/tinyi18n-cli/issues"
+  },
+  "keywords": [
+    "cli",
+    "i18n",
+    "internationalization",
+    "localization",
+    "tool",
+    "translation"
+  ],
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "tinyi18n": "./dist/index.mjs"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "cross-spawn": "^7.0.6",
+    "jiti": "^2.7.0",
+    "kolorist": "^1.8.0",
+    "lowdb": "^7.0.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/node": "^24.13.1",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5"
+  }
+}

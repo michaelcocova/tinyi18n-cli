@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "esModuleInterop": true
+  },
+  "include": ["playground/**/*", "packages/**/*", "typings/*.d.ts"]
+}
