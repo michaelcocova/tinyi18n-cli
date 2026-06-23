@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { markRaw, onBeforeUnmount, onMounted, watch } from 'vue'
-import { useTinyI18nDocument } from '@/composables/core/useTinyI18nDocument'
-import { useMessageChecked } from '@/composables/message/useMessageChecked'
+import { useDataCenter } from '@/composables/data-center/useDataCenter'
+import { useTranslations } from '@/composables/message/useTranslations'
 import MessagesActionsBar from '../components/workspace/MessagesActionsBar.vue'
 import { toast } from '../utils/toast.ts'
 
-const { load } = useTinyI18nDocument()
-const { checkedIds } = useMessageChecked()
+const { load } = useDataCenter()
+const { checkedIds } = useTranslations()
 const messagesActionsToastId = 'workspace-messages-actions'
 
 onMounted(() => {

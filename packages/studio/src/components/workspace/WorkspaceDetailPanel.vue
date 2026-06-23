@@ -1,25 +1,22 @@
 <script setup lang="ts">
+import type { LocaleTreeGroupNode } from '../../../../cli/src/core/message.ts'
 import { FolderInput, FolderPlus, Plus, Trash2 } from '@lucide/vue'
 import { get } from 'lodash-es'
 import { useItemEditor } from '../../composables/commands/useItemEditor.ts'
-import { useItemMutations } from '../../composables/commands/useItemMutations.ts'
 import { useLocaleConfig } from '../../composables/core/useLocaleConfig.ts'
 import { useGroupTree } from '../../composables/group/useGroupTree.ts'
 import { useMoveTargetPolicy } from '../../composables/group/useMoveTargetPolicy.ts'
-import { useMessageExpansion } from '../../composables/message/useMessageExpansion.ts'
-import { useMessageSelection } from '../../composables/message/useMessageSelection.ts'
-import { useSelectedMessage } from '../../composables/message/useSelectedMessage.ts'
+import { useTranslations } from '../../composables/message/useTranslations.ts'
+import { confirm } from '../../utils/confirm'
 import { Button } from '../ui/button/index.ts'
+import { Input } from '../ui/input/index.ts'
+import { Textarea } from '../ui/textarea/index.ts'
 import WorkspaceGroupSelectMenu from './WorkspaceGroupSelectMenu.vue'
 
-const { selectedNode } = useSelectedMessage()
-const { renameKey, renameTitle, setTranslation } = useItemEditor()
-const { createGroup, createMessage, removeItems, moveItems }
-  = useItemMutations()
 const { localeConfig } = useLocaleConfig()
 const { tree } = useGroupTree()
-const { toggleExpanded } = useMessageExpansion()
-const { select } = useMessageSelection()
+const { toggleExpanded, select, selectedNode, moveItems, removeItems, createGroup, createMessage } = useTranslations()
+const { renameKey, renameTitle, setTranslation } = useItemEditor()
 const blockedSourceIds = computed(() =>
   selectedNode.value ? [selectedNode.value.id] : [],
 )
@@ -82,6 +79,15 @@ async function handleDelete() {
   if (!current) {
     return
   }
+
+  const ok = await confirm({
+    title: '确定删除当前记录吗？',
+    description: '删除后会移入最近删除。',
+    confirmText: '删除',
+    confirmVariant: 'destructive',
+  })
+  if (!ok)
+    return
 
   await removeItems([current.id])
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { LocaleTreeGroupNode } from '../../../../cli/src/core/message.ts'
 import { FolderInput } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import { Button } from '../ui/button/index.ts'

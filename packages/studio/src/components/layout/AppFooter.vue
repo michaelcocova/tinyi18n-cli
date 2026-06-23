@@ -5,9 +5,9 @@ import { Status } from '@/components/ui/status'
 import { useProjectFileSync } from '@/composables/commands/useProjectFileSync'
 import { useSaveQueue } from '@/composables/commands/useSaveQueue'
 import { useLocaleConfig } from '@/composables/core/useLocaleConfig'
-import { useTinyI18nDocument } from '@/composables/core/useTinyI18nDocument'
+import { useDataCenter } from '@/composables/data-center/useDataCenter'
 
-const { document } = useTinyI18nDocument()
+const { state } = useDataCenter()
 const { localeConfig } = useLocaleConfig()
 const { saving, pendingCount, lastSavedAt, saveError } = useSaveQueue()
 const { isSyncing, lastSyncedAt, error: syncError } = useProjectFileSync()
@@ -81,22 +81,22 @@ const syncStatusText = computed<string>(() => {
 <template>
   <footer class="flex items-center justify-between gap-4 p-1 px-2 text-xs">
     <p
-      v-if="document.isLoading"
+      v-if="state.isLoading"
       class="text-muted-foreground"
     >
       正在加载 /api/data ...
     </p>
     <span
-      v-else-if="document.error && !document.hasLoaded"
+      v-else-if="state.error && !state.hasLoaded"
       class="text-destructive"
     >
-      加载失败：{{ document.error }}
+      加载失败：{{ state.error }}
     </span>
     <p
       v-else
       class="text-muted-foreground"
     >
-      已加载 {{ document.items.length }} 条记录，默认语言
+      已加载 {{ state.items.length }} 条记录，默认语言
       {{ localeConfig.defaultLocaleConfig?.label }}
     </p>
     <div class="flex items-center gap-3">

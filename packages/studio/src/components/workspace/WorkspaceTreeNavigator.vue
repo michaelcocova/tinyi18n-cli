@@ -3,13 +3,13 @@ import { ChevronRight, LocateFixed } from '@lucide/vue'
 import { get } from 'lodash-es'
 import { useGroupNavigatorExpansion } from '../../composables/group/useGroupNavigatorExpansion'
 import { useGroupTree } from '../../composables/group/useGroupTree'
-import { useMessageSearchMatches } from '../../composables/message/useMessageSearchMatches'
+import { useTranslations } from '../../composables/message/useTranslations'
 import { projectVisibleRows } from '../../composables/tree/projectVisibleRows'
 
 const { tree } = useGroupTree()
 const { expandedIds, toggleExpanded, isExpanded }
   = useGroupNavigatorExpansion()
-const { matchedIds } = useMessageSearchMatches()
+const { matchedIds } = useTranslations()
 const open = ref(false)
 const groups = computed(() =>
   projectVisibleRows(tree.value, expandedIds.value, {

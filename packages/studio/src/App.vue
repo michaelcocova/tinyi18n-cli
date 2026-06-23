@@ -2,12 +2,12 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { Toaster } from 'vue-sonner'
-import { useTinyI18nDocument } from './composables/core/useTinyI18nDocument'
+import { useDataCenter } from './composables/data-center/useDataCenter'
 import SetupPage from './views/setup/SetupPage.vue'
 import 'vue-sonner/style.css'
 
 const route = useRoute()
-const { document, load } = useTinyI18nDocument()
+const { state, load } = useDataCenter()
 const currentPageTitle = computed(() =>
   String(route.meta.title ?? 'TinyI18n Studio'),
 )
@@ -30,7 +30,7 @@ onMounted(() => {
 
   <!-- Loading State -->
   <div
-    v-if="!document.hasLoaded"
+    v-if="!state.hasLoaded"
     class="flex h-screen w-full items-center justify-center bg-white"
   >
     <div
@@ -39,11 +39,11 @@ onMounted(() => {
   </div>
 
   <!-- 拦截未初始化状态：如果没有 config.ts，或者没有对应的 data.json 数据文件，就判定为未配置好，强制进入 Init 表单页 -->
-  <SetupPage v-else-if="document.snapshot && !document.snapshot.initialized" />
+  <SetupPage v-else-if="state.snapshot && !state.snapshot.initialized" />
 
   <!-- Error State (Other than not initialized) -->
   <div
-    v-else-if="document.error"
+    v-else-if="state.error"
     class="flex h-screen w-full items-center justify-center bg-white p-4"
   >
     <div class="max-w-md text-center">
@@ -51,7 +51,7 @@ onMounted(() => {
         无法加载工作区
       </h2>
       <p class="mt-2 text-sm text-zinc-500">
-        {{ document.error || document.snapshot?.error || "未知错误" }}
+        {{ state.error || state.snapshot?.error || "未知错误" }}
       </p>
       <Button
         class="mt-4"
@@ -66,7 +66,7 @@ onMounted(() => {
   <SidebarProvider
     v-else
     :default-open="false"
-    class="h-svh overflow-hidden"
+    class="h-svh overflow-hidden fixed inset-0"
   >
     <AppSidebar />
     <SidebarInset class="h-full overflow-hidden flex flex-col m-0 divide-y">

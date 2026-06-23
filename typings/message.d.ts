@@ -47,6 +47,11 @@ declare global {
         ids: string[]
         parent?: string
       }
+    } | {
+      type: 'restore'
+      data: {
+        ids: string[]
+      }
     }
 
   export interface TinyI18nOperationResult {

@@ -1,16 +1,16 @@
 <script setup lang="ts">
+import type { LocaleTreeGroupNode } from '../../../../cli/src/core/message.ts'
 import { Trash2, X } from '@lucide/vue'
 import { computed } from 'vue'
-import { useItemMutations } from '../../composables/commands/useItemMutations'
 import { useGroupTree } from '../../composables/group/useGroupTree'
 import { useMoveTargetPolicy } from '../../composables/group/useMoveTargetPolicy'
-import { useMessageChecked } from '../../composables/message/useMessageChecked'
+import { useTranslations } from '../../composables/message/useTranslations'
+import { confirm } from '../../utils/confirm'
 import { toast } from '../../utils/toast'
 import { Button } from '../ui/button'
 
-const { checkedIds, clearChecked: clearAllChecked } = useMessageChecked()
+const { checkedIds, clearChecked: clearAllChecked, removeItems, moveItems: moveSelectedItems } = useTranslations()
 const { tree } = useGroupTree()
-const { removeItems, moveItems: moveSelectedItems } = useItemMutations()
 const checkedIdList = computed(() => [...checkedIds.value])
 const checkedCount = computed(() => checkedIdList.value.length)
 const { blockedIds } = useMoveTargetPolicy(checkedIdList)
@@ -21,6 +21,15 @@ function clearChecked() {
 
 async function handleDelete() {
   const count = checkedCount.value
+
+  const ok = await confirm({
+    title: `确定删除选中的 ${count} 条记录吗？`,
+    description: '删除后会移入最近删除。',
+    confirmText: '删除',
+    confirmVariant: 'destructive',
+  })
+  if (!ok)
+    return
 
   await removeItems(checkedIdList.value)
   toast.success('已删除选中项', {

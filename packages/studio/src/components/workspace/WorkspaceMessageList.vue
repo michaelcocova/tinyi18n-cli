@@ -3,11 +3,7 @@ import type { VListHandle } from 'virtua/vue'
 import type { HTMLAttributes } from 'vue'
 import { FolderPlus, Plus } from '@lucide/vue'
 import { VList } from 'virtua/vue'
-import { useItemMutations } from '../../composables/commands/useItemMutations.ts'
-import { useMessageExpansion } from '../../composables/message/useMessageExpansion.ts'
-import { useMessageSearchMatches } from '../../composables/message/useMessageSearchMatches.ts'
-import { useMessageSelection } from '../../composables/message/useMessageSelection.ts'
-import { useMessageTree } from '../../composables/message/useMessageTree.ts'
+import { useTranslations } from '../../composables/message/useTranslations.ts'
 import { projectVisibleRows } from '../../composables/tree/projectVisibleRows.ts'
 import { Button } from '../ui/button'
 import WorkspaceMessageRow from './WorkspaceMessageRow.vue'
@@ -15,11 +11,7 @@ import WorkspaceMessageRow from './WorkspaceMessageRow.vue'
 const props = defineProps<{
   class?: HTMLAttributes['class']
 }>()
-const { tree } = useMessageTree()
-const { expandedIds } = useMessageExpansion()
-const { matchedIds } = useMessageSearchMatches()
-const { createGroup, createMessage } = useItemMutations()
-const { select } = useMessageSelection()
+const { tree, expandedIds, select, matchedIds, createGroup, createMessage } = useTranslations()
 const listRef = ref<VListHandle>()
 const rows = computed(() =>
   projectVisibleRows(tree.value, expandedIds.value, {

@@ -1,17 +1,15 @@
 <script setup lang="ts">
+import type { LocaleTreeNode } from '../../../../cli/src/core/message.ts'
 import { FolderPlus, Plus, Trash2 } from '@lucide/vue'
-import { useItemMutations } from '../../composables/commands/useItemMutations'
-import { useMessageExpansion } from '../../composables/message/useMessageExpansion'
-import { useMessageSelection } from '../../composables/message/useMessageSelection'
+import { useTranslations } from '../../composables/message/useTranslations'
+import { confirm } from '../../utils/confirm'
 import { Button } from '../ui/button'
 
 const props = defineProps<{
   item: LocaleTreeNode
 }>()
 
-const { createGroup, createMessage, removeItems } = useItemMutations()
-const { toggleExpanded } = useMessageExpansion()
-const { select } = useMessageSelection()
+const { createGroup, createMessage, removeItems, toggleExpanded, select } = useTranslations()
 
 async function handleAddGroup() {
   const nextItem = await createGroup(props.item.id)
@@ -36,6 +34,14 @@ async function handleAddMessage() {
 }
 
 async function handleDeleteItem() {
+  const ok = await confirm({
+    title: '确定删除这条记录吗？',
+    description: '删除后会移入最近删除。',
+    confirmText: '删除',
+    confirmVariant: 'destructive',
+  })
+  if (!ok)
+    return
   await removeItems([props.item.id])
 }
 </script>

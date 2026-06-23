@@ -1,4 +1,5 @@
 import type { ComputedRef, Ref } from 'vue'
+import type { LocaleTreeModel } from '../../../../cli/src/core/message.ts'
 import { ref, watch } from 'vue'
 
 export type TreeDefaultExpandedDepth = number | 'infinite'
@@ -10,10 +11,7 @@ interface TreeExpansionStateOptions {
 
 type ExpandableTree = Pick<LocaleTreeModel, 'flat' | 'byId' | 'expandableIds'>
 
-function resolveInitialExpandedIds(
-  tree: ExpandableTree,
-  defaultExpandedDepth: TreeDefaultExpandedDepth,
-) {
+function resolveInitialExpandedIds(tree: ExpandableTree, defaultExpandedDepth: TreeDefaultExpandedDepth) {
   if (defaultExpandedDepth === 'infinite') {
     return new Set(tree.expandableIds)
   }
@@ -38,23 +36,17 @@ export function useTreeExpansionState(
   watch(
     [tree, ready ?? ref(true)],
     ([nextTree, isReady]) => {
-      if (!isReady) {
+      if (!isReady)
         return
-      }
 
       if (!initialized) {
-        expandedIds.value = resolveInitialExpandedIds(
-          nextTree,
-          defaultExpandedDepth,
-        )
+        expandedIds.value = resolveInitialExpandedIds(nextTree, defaultExpandedDepth)
         initialized = true
         return
       }
 
       const validIds = new Set(nextTree.expandableIds)
-      expandedIds.value = new Set(
-        [...expandedIds.value].filter(id => validIds.has(id)),
-      )
+      expandedIds.value = new Set([...expandedIds.value].filter(id => validIds.has(id)))
     },
     { immediate: true },
   )

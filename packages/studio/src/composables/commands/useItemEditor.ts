@@ -1,10 +1,10 @@
 import { createGlobalState } from '@vueuse/core'
-import { useTinyI18nDocument } from '../core/useTinyI18nDocument.ts'
+import { useDataCenter } from '../data-center/useDataCenter.ts'
 import { useSaveQueue } from './useSaveQueue.ts'
 
 export const useItemEditor = createGlobalState(() => {
   const { push } = useSaveQueue()
-  const { applyLocalOperation } = useTinyI18nDocument()
+  const { applyLocalOperation } = useDataCenter()
 
   async function renameKey(id: string, key: string) {
     const operation: TinyI18nOperation = {

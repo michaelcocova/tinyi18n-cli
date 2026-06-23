@@ -1,3 +1,9 @@
+import type {
+  LocaleTreeGroupNode,
+  LocaleTreeModel,
+  LocaleTreeNode,
+} from '../../../../cli/src/core/message.ts'
+
 interface ProjectVisibleRowsOptions {
   matchedIds?: Set<string>
 }
@@ -15,7 +21,7 @@ export function projectVisibleRows(
       return false
     }
 
-    return (tree.descendantsById.get(nodeId) ?? []).some(node =>
+    return (tree.descendantsById.get(nodeId) ?? []).some((node: LocaleTreeNode) =>
       matchedIds.has(node.id),
     )
   }
