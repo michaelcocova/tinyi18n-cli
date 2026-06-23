@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { LocaleTreeGroupNode } from '../../../../cli/src/core/message.ts'
 import { ChevronRight } from '@lucide/vue'
 import { computed } from 'vue'
 import { useGroupFilterExpansion } from '../../composables/group/useGroupFilterExpansion'
@@ -74,15 +75,15 @@ function selectCurrent() {
         <span class="truncate">
           {{ node.original.type === "group" ? node.original.title : node.key }}
         </span>
-        <span class="ml-auto text-xs text-muted-foreground">{{
-          node.key
-        }}</span>
+        <span class="ml-auto text-xs text-muted-foreground">
+          {{ node.key }}
+        </span>
       </button>
     </div>
 
     <div
       v-if="expanded"
-      class="ml-3 border-l"
+      class="ml-3"
     >
       <WorkspaceGroupSelectMenuNode
         v-for="child in children"

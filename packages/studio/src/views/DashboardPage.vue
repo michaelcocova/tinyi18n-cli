@@ -9,7 +9,7 @@ import {
 } from '@lucide/vue'
 import { computed, onMounted } from 'vue'
 import { useLocaleConfig } from '@/composables/core/useLocaleConfig'
-import { useTinyI18nDocument } from '@/composables/core/useTinyI18nDocument'
+import { useDataCenter } from '@/composables/data-center/useDataCenter'
 import { useQualityCheck } from '@/composables/quality/useQualityCheck'
 import { getLanguageLabel } from '@/constants/language'
 
@@ -28,7 +28,7 @@ interface DashboardSummaryCard {
   description: string
 }
 
-const { document, load } = useTinyI18nDocument()
+const { state, load } = useDataCenter()
 const { localeConfig } = useLocaleConfig()
 const { report, isScanning, error: qualityError } = useQualityCheck()
 
@@ -38,7 +38,7 @@ onMounted(() => {
   void load()
 })
 
-const items = computed<TinyI18nItem[]>(() => document.value.items)
+const items = computed<TinyI18nItem[]>(() => state.value.items)
 
 const groups = computed<TinyI18nGroup[]>(() =>
   items.value.filter((item): item is TinyI18nGroup => item.type === 'group'),
@@ -56,9 +56,9 @@ const localeItems = computed<TinyI18nLocaleConfig[]>(
   () => localeConfig.value.locales,
 )
 const localeCount = computed(() => localeItems.value.length)
-const entryCount = computed(() => document.value.config?.entries?.length ?? 0)
+const entryCount = computed(() => state.value.config?.entries?.length ?? 0)
 const dataFilename = computed(
-  () => document.value.config?.filename ?? '.data.json',
+  () => state.value.config?.filename ?? '.data.json',
 )
 const issueCount = computed<number>(() => {
   const counts = report.value.counts
@@ -72,11 +72,11 @@ const issueCount = computed<number>(() => {
 })
 
 const workspaceStatus = computed(() => {
-  if (document.value.error || qualityError.value) {
+  if (state.value.error || qualityError.value) {
     return '异常'
   }
 
-  if (document.value.isLoading) {
+  if (state.value.isLoading) {
     return '加载中'
   }
 
@@ -84,7 +84,7 @@ const workspaceStatus = computed(() => {
     return '扫描中'
   }
 
-  if (document.value.snapshot?.initialized) {
+  if (state.value.snapshot?.initialized) {
     return '就绪'
   }
 
@@ -115,10 +115,10 @@ const parseRows = computed<DashboardParseRow[]>(() => [
   {
     badge: '配置',
     badgeClass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-    value: document.value.snapshot?.initialized
+    value: state.value.snapshot?.initialized
       ? '.tinyi18n/config.ts 已加载'
       : '等待初始化工作区',
-    meta: document.value.snapshot?.initialized ? '就绪' : '未就绪',
+    meta: state.value.snapshot?.initialized ? '就绪' : '未就绪',
   },
   {
     badge: '快照',
@@ -181,9 +181,9 @@ const summaryCards = computed<DashboardSummaryCard[]>(() => [
     icon: RefreshCw,
     title: '服务状态',
     description:
-      document.value.error
+      state.value.error
       || qualityError.value
-      || document.value.snapshot?.root
+      || state.value.snapshot?.root
       || '等待加载工作区。',
   },
 ])
@@ -212,10 +212,10 @@ const summaryCards = computed<DashboardSummaryCard[]>(() => [
           </div>
         </div>
         <div
-          v-if="document.error || qualityError"
+          v-if="state.error || qualityError"
           class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/20 dark:text-rose-300"
         >
-          {{ document.error || qualityError }}
+          {{ state.error || qualityError }}
         </div>
 
         <div class="mt-10 grid grid-cols-1 items-start gap-3 lg:grid-cols-3">

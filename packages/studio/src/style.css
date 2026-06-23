@@ -116,13 +116,11 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    --popper-available-height: min(
-      calc(var(--reka-popper-available-height) - 48px),
-      480px
-    );
+    --popper-available-height: min(calc(var(--reka-popper-available-height) - 48px),
+        480px);
   }
 
-  body {
+  body, #app {
     @apply bg-background text-foreground;
   }
 
@@ -143,5 +141,24 @@
 
   ::-webkit-scrollbar-track {
     background: transparent;
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.5s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

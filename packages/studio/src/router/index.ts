@@ -16,6 +16,12 @@ const routes: readonly RouteRecordRaw[] = [
     component: () => import('../views/WorkspacePage.vue'),
     meta: { title: '翻译工作台' },
   },
+  {
+    path: '/trash',
+    name: 'trash',
+    component: () => import('../views/TrashPage.vue'),
+    meta: { title: '最近删除' },
+  },
   // {
   //   path: "/quality",
   //   name: "quality",

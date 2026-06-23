@@ -34,7 +34,9 @@ function resolveMessagePath(
   message: TinyI18nMessage,
   itemsById: Map<string, TinyI18nItem>,
 ) {
-  const segments = [message.key]
+  // 注意：key 可能被用户误输入了换行/空格（例如 "ssl\n"），
+  // 如果不做处理会直接变成 JSON 的对象 key，最终输出 `"ssl\\n": { ... }`。
+  const segments = [message.key.trim()]
   let parentId = message.parent
 
   while (parentId) {
@@ -50,7 +52,7 @@ function resolveMessagePath(
       )
     }
 
-    segments.unshift(parent.key)
+    segments.unshift(parent.key.trim())
     parentId = parent.parent
   }
 
@@ -110,7 +112,8 @@ function createSyncPlan(snapshot: TinyI18nSnapshot) {
   for (const message of messages) {
     const path = resolveMessagePath(message, itemsById)
 
-    if (path.some(segment => !segment.trim())) {
+    // resolveMessagePath 已经 trim 过，但这里仍然二次防御
+    if (path.some(segment => !String(segment ?? '').trim())) {
       skipped.push({
         id: message.id,
         path: path.join('.'),

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { HTMLAttributes } from 'vue'
+import type { LocaleTreeNode } from '../../../../cli/src/core/message.ts'
 import {
   CheckSquare,
   ChevronRight,
@@ -9,9 +10,7 @@ import {
   Square,
 } from '@lucide/vue'
 import { useLocaleConfig } from '../../composables/core/useLocaleConfig.ts'
-import { useMessageChecked } from '../../composables/message/useMessageChecked.ts'
-import { useMessageExpansion } from '../../composables/message/useMessageExpansion.ts'
-import { useMessageSelection } from '../../composables/message/useMessageSelection.ts'
+import { useTranslations } from '../../composables/message/useTranslations.ts'
 import { cn } from '../../utils/tailwind.ts'
 import WorkspaceRowActions from './WorkspaceRowActions.vue'
 
@@ -21,9 +20,7 @@ const props = defineProps<{
 }>()
 
 const { localeConfig } = useLocaleConfig()
-const { isExpanded, toggleExpanded } = useMessageExpansion()
-const { isSelected, select } = useMessageSelection()
-const { isChecked, isIndeterminate, toggleChecked } = useMessageChecked()
+const { isExpanded, toggleExpanded, isSelected, select, isChecked, isIndeterminate, toggleChecked } = useTranslations()
 const messagePreviewLocale = computed(
   () => localeConfig.value.defaultLocale || 'zh-CN',
 )

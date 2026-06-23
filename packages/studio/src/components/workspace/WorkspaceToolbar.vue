@@ -1,66 +1,100 @@
 <script setup lang="ts">
 import type { TinyI18nPathFilterMode } from '../../composables/path-query'
+import type { SearchBoxModelValue, SearchBoxSchema } from '@/components/ui/search-box'
 import {
   ChevronDown,
   FolderPlus,
   Funnel,
-  ListFilterPlus,
   Plus,
-  Search,
-  X,
 } from '@lucide/vue'
-import { useItemMutations } from '../../composables/commands/useItemMutations'
+import { SearchBox } from '@/components/ui/search-box'
 import { useGroupTree } from '../../composables/group/useGroupTree'
-import { usePathFilters } from '../../composables/group/usePathFilters'
-import { useMessageSearchQuery } from '../../composables/message/useMessageSearchQuery'
-import { useMessageSelection } from '../../composables/message/useMessageSelection'
+import { useTranslations } from '../../composables/message/useTranslations.ts'
 
-interface PathFilterDraft {
-  id: string
-  mode: TinyI18nPathFilterMode
-}
+const { tree: groupTree } = useGroupTree()
+const {
+  filterState,
+  createGroup,
+  createMessage,
+  select,
+  availableLocales,
+} = useTranslations()
 
-const { tree } = useGroupTree()
-const { filters, addFromGroup, removeFilter } = usePathFilters()
-const { query, setQuery, clearQuery } = useMessageSearchQuery()
-const { createGroup, createMessage } = useItemMutations()
-const { select } = useMessageSelection()
-const drafts = ref<PathFilterDraft[]>([])
-const pathFilterModeOptions: Array<{
-  value: TinyI18nPathFilterMode
-  label: string
-}> = [
-  { value: 'include', label: '包含' },
-  { value: 'exclude', label: '排除' },
-]
+const pathFilterDraftMode = ref<TinyI18nPathFilterMode>('include')
 
-function createDraft() {
-  drafts.value = [
-    ...drafts.value,
-    {
-      id: crypto.randomUUID(),
-      mode: 'include',
-    },
-  ]
-}
+const searchBoxItems = computed<SearchBoxSchema[]>(() => [
+  {
+    field: 'query',
+    label: '关键词',
+    type: 'input',
+    placeholder: '搜索 key / 文本 / 路径',
+  },
+  {
+    field: 'pathFilter',
+    label: '路径过滤',
+    type: 'custom',
+    repeatable: true,
+    slotName: 'pathFilter',
+  },
+  {
+    field: 'localeScope',
+    label: '语言范围',
+    type: 'enum',
+    mode: 'multi',
+    options: availableLocales.value.map(code => ({
+      label: code,
+      value: code,
+    })),
+  },
+  {
+    field: 'issues',
+    label: '问题类型',
+    type: 'enum',
+    mode: 'multi',
+    options: [
+      {
+        label: '缺失翻译',
+        description: '任意语言翻译缺失',
+        value: 'missing_translation',
+      },
+      ...availableLocales.value.map(code => ({ label: `${code} 缺失翻译`, value: `$missing_translation:${code}` })),
+      {
+        label: '缺失 Key',
+        value: 'missing_key',
+      },
+      {
+        label: '重复 Key',
+        value: 'duplicate_key',
+      },
+      {
+        label: '重复翻译内容',
+        value: 'duplicate_translation',
+      },
+      {
+        label: '未使用 Key',
+        value: 'unused_key',
+      },
+      {
+        label: '占位符不一致',
+        value: 'placeholder_mismatch',
+      },
+    ],
+  },
+])
 
-function updateDraftMode(id: string, mode: TinyI18nPathFilterMode) {
-  drafts.value = drafts.value.map(draft =>
-    draft.id === id ? { ...draft, mode } : draft,
-  )
-}
-
-function selectDraftGroup(draft: PathFilterDraft, group: LocaleTreeGroupNode) {
-  addFromGroup(draft.mode, group.id)
-  drafts.value = drafts.value.filter(item => item.id !== draft.id)
-}
-
-function formatPathFilterQuery(query: string) {
-  return query.replace(/^\$\./, '')
-}
-function removeDraft(id: string) {
-  drafts.value = drafts.value.filter(draft => draft.id !== id)
-}
+const searchBoxFilterState = computed<SearchBoxModelValue>({
+  get() {
+    return filterState.value
+  },
+  set(next) {
+    filterState.value = {
+      query: String(next?.query ?? ''),
+      pathFilter: Array.isArray(next?.pathFilter) ? next.pathFilter.map(String) : [],
+      localeScope: Array.isArray(next?.localeScope) ? next.localeScope.map(String) : [],
+      issues: Array.isArray(next?.issues) ? next.issues.map(String) : [],
+    }
+  },
+})
 
 async function handleAddGroup() {
   const nextItem = await createGroup()
@@ -81,89 +115,68 @@ async function handleAddMessage() {
   <div class="mb-0 flex flex-wrap items-center gap-2 border-b px-4 py-1.5">
     <WorkspaceTreeNavigator />
     <Funnel class="size-3.5" />
-    <Badge
-      v-for="filter in filters"
-      :key="filter.id"
-      variant="outline"
-      class="border-dashed h-7 gap-1 rounded-full px-1"
-    >
-      <span>{{ filter.mode === "include" ? "" : "!" }}</span>
-      <span class="font-mono font-normal">{{
-        formatPathFilterQuery(filter.query)
-      }}</span>
-      <button
-        class="rounded-full p-0.5 hover:bg-black/10"
-        type="button"
-        @click="removeFilter(filter.id)"
-      >
-        <X class="size-3" />
-      </button>
-    </Badge>
-    <Badge
-      v-for="draft in drafts"
-      :key="draft.id"
-      variant="outline"
-      class="h-7 gap-1 rounded-0! px-1"
-    >
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <Button
-            variant="ghost"
-            class="text-xs font-normal h-5 p-0 rounded-0.5"
-          >
-            {{ draft.mode === "include" ? "包含" : "排除" }}
-            <ChevronDown class="size-3" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          class="[--radius:0.95rem]"
-        >
-          <DropdownMenuItem
-            v-for="option in pathFilterModeOptions"
-            :key="option.value"
-            @click="updateDraftMode(draft.id, option.value)"
-          >
-            {{ option.label }}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <WorkspaceGroupSelectMenu
-        label="请选择"
-        :tree="tree.roots"
-        expansion-scope="filter"
-        @select="selectDraftGroup(draft, $event)"
-      >
-        <template #default="{ disabled }">
-          <Button
-            variant="ghost"
-            class="text-xs font-normal h-5 p-0 rounded-0.5"
-            :disabled="disabled"
-          >
-            选择
-            <ChevronDown class="size-3" />
-          </Button>
-        </template>
-      </WorkspaceGroupSelectMenu>
-      <button
-        class="rounded-full p-0.5 hover:bg-black/10"
-        type="button"
-        @click="removeDraft(draft.id)"
-      >
-        <X class="size-3" />
-      </button>
-    </Badge>
 
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      class="size-6"
-      title="添加过滤条件"
-      aria-label="添加过滤条件"
-      @click="createDraft"
+    <SearchBox
+      v-model="searchBoxFilterState"
+      class="flex-1"
+      :items="searchBoxItems"
     >
-      <ListFilterPlus />
-    </Button>
+      <!-- 路径过滤：custom slot -->
+      <template #pathFilter="{ confirm, close }">
+        <div class="space-y-2">
+          <div class="text-xs text-muted-foreground">
+            选择一个分组路径作为过滤条件
+          </div>
+          <div class="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="h-7 px-2 text-xs font-normal"
+                >
+                  {{ pathFilterDraftMode === 'include' ? '包含' : '排除' }}
+                  <ChevronDown class="ml-1 size-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem @click="pathFilterDraftMode = 'include'">
+                  包含
+                </DropdownMenuItem>
+                <DropdownMenuItem @click="pathFilterDraftMode = 'exclude'">
+                  排除
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <WorkspaceGroupSelectMenu
+              label="请选择"
+              :tree="groupTree.roots"
+              expansion-scope="filter"
+              @select="
+                (group) => {
+                  const mode: TinyI18nPathFilterMode = pathFilterDraftMode
+                  const path = group.meta.path
+                  confirm(`${mode}:${path}`)
+                  close()
+                }
+              "
+            >
+              <template #default="{ disabled }">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  class="h-7 px-2 text-xs font-normal"
+                  :disabled="disabled"
+                >
+                  选择分组
+                  <ChevronDown class="ml-1 size-3" />
+                </Button>
+              </template>
+            </WorkspaceGroupSelectMenu>
+          </div>
+        </div>
+      </template>
+    </SearchBox>
     <div class="flex-1" />
     <div class="flex items-center gap-1">
       <Button
@@ -185,33 +198,5 @@ async function handleAddMessage() {
         添加消息
       </Button>
     </div>
-
-    <InputGroup class="h-8 w-64">
-      <InputGroupInput
-        :model-value="query"
-        placeholder="搜索 key / 标题 / 翻译"
-        @update:model-value="setQuery(String($event))"
-      />
-      <InputGroupAddon align="inline-end">
-        <InputGroupButton
-          v-if="!query"
-          aria-label="搜索"
-          title="搜索"
-          size="icon-xs"
-        >
-          <Search />
-        </InputGroupButton>
-        <Button
-          v-else
-          aria-label="清空搜索"
-          title="清空搜索"
-          size="icon-sm"
-          variant="ghost"
-          @click="clearQuery"
-        >
-          <X />
-        </Button>
-      </InputGroupAddon>
-    </InputGroup>
   </div>
 </template>

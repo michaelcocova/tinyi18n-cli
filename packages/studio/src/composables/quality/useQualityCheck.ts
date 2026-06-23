@@ -1,7 +1,7 @@
 import { createGlobalState } from '@vueuse/core'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useLocaleConfig } from '../core/useLocaleConfig.ts'
-import { useTinyI18nDocument } from '../core/useTinyI18nDocument.ts'
+import { useDataCenter } from '../data-center/useDataCenter.ts'
 
 function createEmptyReport(): TinyI18nQualityReport {
   return {
@@ -32,7 +32,7 @@ function cloneItems(items: TinyI18nItem[]): TinyI18nItem[] {
 }
 
 export const useQualityCheck = createGlobalState(() => {
-  const { document, load } = useTinyI18nDocument()
+  const { state, load } = useDataCenter()
   const { localeConfig } = useLocaleConfig()
   const report = ref<TinyI18nQualityReport>(createEmptyReport())
   const isScanning = ref(false)
@@ -52,15 +52,15 @@ export const useQualityCheck = createGlobalState(() => {
   }
 
   async function run() {
-    if (!document.value.hasLoaded) {
+    if (!state.value.hasLoaded) {
       await load()
     }
 
-    if (document.value.isLoading) {
+    if (state.value.isLoading) {
       return
     }
 
-    if (!document.value.items.length) {
+    if (!state.value.items.length) {
       report.value = createEmptyReport()
       return
     }
@@ -68,7 +68,7 @@ export const useQualityCheck = createGlobalState(() => {
     error.value = ''
     isScanning.value = true
     worker.postMessage({
-      items: cloneItems(document.value.items),
+      items: cloneItems(state.value.items),
       languages: localeConfig.value.locales.map(
         (item: TinyI18nLocaleConfig) => item.code,
       ),
@@ -76,9 +76,9 @@ export const useQualityCheck = createGlobalState(() => {
   }
 
   watch(
-    [() => document.value.items, () => localeConfig.value.locales],
+    [() => state.value.items, () => localeConfig.value.locales],
     () => {
-      if (!document.value.items.length) {
+      if (!state.value.items.length) {
         report.value = createEmptyReport()
         return
       }

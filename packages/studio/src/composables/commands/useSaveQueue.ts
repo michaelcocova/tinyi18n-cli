@@ -1,10 +1,10 @@
 import { createGlobalState } from '@vueuse/core'
 import { ref } from 'vue'
-import { useTinyI18nDocument } from '../core/useTinyI18nDocument.ts'
+import { useDataCenter } from '../data-center/useDataCenter.ts'
 import { createTinyI18nOperationScheduler } from '../io/operation.ts'
 
 export const useSaveQueue = createGlobalState(() => {
-  const { commit } = useTinyI18nDocument()
+  const { commit } = useDataCenter()
   const lastSavedAt = ref<number>()
   const saveError = ref('')
   const scheduler = createTinyI18nOperationScheduler({

@@ -6,6 +6,42 @@ export interface TinyI18nPathFilter {
   query: string
 }
 
+/**
+ * 将 SearchBox 输出的 pathFilter 字符串（例如 `include:a.b` / `exclude:legacy`）
+ * 解析为内部路径过滤结构
+ */
+export function parsePathFilterString(value: string): Omit<TinyI18nPathFilter, 'id'> | undefined {
+  const raw = String(value ?? '').trim()
+  if (!raw)
+    return undefined
+  const [modeRaw, ...rest] = raw.split(':')
+  const mode: TinyI18nPathFilterMode = modeRaw === 'exclude' ? 'exclude' : 'include'
+  const path = rest.join(':').trim()
+  const normalized = normalizePathQuery(path)
+  if (!normalized)
+    return undefined
+  return { mode, query: normalized }
+}
+
+export function matchPathFilterStrings(
+  node: PathMatchNode,
+  filters: string[],
+) {
+  const parsed = filters
+    .map(parsePathFilterString)
+    .filter((v): v is Omit<TinyI18nPathFilter, 'id'> => Boolean(v))
+  const includeQueries = parsed.filter(f => f.mode === 'include').map(f => f.query)
+  const excludeQueries = parsed.filter(f => f.mode === 'exclude').map(f => f.query)
+  const matchesInclude
+    = includeQueries.length === 0
+      || includeQueries.some(query => matchPathQuery(node, query))
+  const matchesExclude = excludeQueries.some(query =>
+    matchPathQuery(node, query),
+  )
+
+  return matchesInclude && !matchesExclude
+}
+
 type PathMatchNode
   = | {
     keyChain: string[]
